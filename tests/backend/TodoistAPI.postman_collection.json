@@ -1,0 +1,734 @@
+{
+	"info": {
+		"_postman_id": "ea93e74d-0b03-4a2e-ba7b-fbcf5c394f3d",
+		"name": "TodoistAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Project",
+			"item": [
+				{
+					"name": "Create Project",
+					"item": [
+						{
+							"name": "Create new project",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"//status code 200 ok",
+											"pm.test(\"Status code is 2xx\", function () {",
+											"    pm.response.to.be.success;//cuz many response have code 201, etc.",
+											"});",
+											"",
+											"//Project name is Task Project, regarding Body : I use JSON value check",
+											" var jsonData = pm.response.json();",
+											"var name = pm.environment.get(\"projectName\");",
+											"pm.test(\"Project name is correct\", function () {",
+											"// var jsonData = pm.response.json();// this was move to outside",
+											"pm.expect(jsonData.name).to.eql(name);//change the body with name Test1 to Test2",
+											"});",
+											"",
+											"pm.environment.set(\"projectId\", jsonData.id);",
+											"",
+											"//Validated the JSON Schema in base on response",
+											"pm.test(\"Validate schema\", () => {",
+											"    pm.response.to.have.jsonSchema(pm.response.json());",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "X-Requested-Id",
+										"value": "$(uuidgen)",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{projectName}}\"\n}"
+								},
+								"url": {
+									"raw": "{{baseURLproject}}",
+									"host": [
+										"{{baseURLproject}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Project",
+					"item": [
+						{
+							"name": "Get a Project",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"//check the status code 200, but change 200 for 2xx ",
+											"pm.test(\"Status code is 2xx\", function () {",
+											"    pm.response.to.be.success;//cuz many response have code 201, etc.",
+											"});",
+											"",
+											"//after add another test with snippets Json respons, with JSON value check",
+											"var idp = pm.environment.get(\"projectId\");",
+											"pm.test(\"Project ID is correct\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    //pm.expect(jsonData.value).to.eql(100);//remplace the 100 with the ID ",
+											"    pm.expect(jsonData.id).to.eql(idp);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLproject}}/{{projectId}}",
+									"host": [
+										"{{baseURLproject}}"
+									],
+									"path": [
+										"{{projectId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get active tasks",
+					"item": [
+						{
+							"name": "Get active tasks",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 2xx\", function () {",
+											"    pm.response.to.be.success;//cuz many response have code 201, etc.",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}",
+									"host": [
+										"{{baseURLtask}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get active tasks [negative]",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 4xx\", function () {",
+											"    pm.response.to.be.notFound;//cuz many response have code 201, etc.",
+											"});",
+											"",
+											"pm.test(\"Body matches string\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"404 page not found\")});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}/",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create a new task",
+					"item": [
+						{
+							"name": "Create a new task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 2xx\", function () {",
+											"    pm.response.to.be.success;//cuz many response have code 201",
+											"});",
+											"//Validated the JSON Schema in base on response",
+											"pm.test(\"Validate schema\", () => {",
+											"    pm.response.to.have.jsonSchema(pm.response.json());",
+											"});",
+											"",
+											"//",
+											"//Project name is Task Project, regarding Body : I use JSON value check",
+											"",
+											" var jsonData = pm.response.json();",
+											"var content = pm.environment.get(\"contentName\");",
+											"pm.test(\"Task body: content is correct\", function () {",
+											"pm.expect(jsonData.content).to.eql(content);",
+											"});",
+											"",
+											"//aditional , set an enviroment variable",
+											"pm.environment.set(\"taskId\", jsonData.id);",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "X-Requested-Id",
+										"value": "$(uuidgen)",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\" : \"{{contentName}}\", \"due_string\": \"tomorrow at 13:00\", \"due_lang\": \"en\", \"project_id\": {{projectId}}, \"priority\": 4\n}"
+								},
+								"url": {
+									"raw": "{{baseURLtask}}",
+									"host": [
+										"{{baseURLtask}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create a new task [negative]",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 4xx\", function () {",
+											"    pm.response.to.be.badRequest;//cuz many response have code 201, etc.",
+											"});",
+											"",
+											"pm.test(\"Body matches string\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"Empty content\")});",
+											"",
+											"",
+											"//response time---bad scenario , the correct scenario is with 200ms",
+											"pm.test(\"Response time is less than 2000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "X-Requested-Id",
+										"value": "$(uuidgen)",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\" : \"\", \"due_string\": \"tomorrow at 13:00\", \"due_lang\": \"en\", \"project_id\": {{projectId}}, \"priority\": 4\n}"
+								},
+								"url": {
+									"raw": "{{baseURLtask}}",
+									"host": [
+										"{{baseURLtask}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get an active task",
+					"item": [
+						{
+							"name": "Get an active task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 2xx\", function () {",
+											"    pm.response.to.be.success;//cuz many response have code 201, etc.",
+											"});",
+											"//snippets Json respons, with JSON value check",
+											"//Check the correct ID of the task",
+											"var idtask = pm.environment.get(\"taskId\");",
+											"pm.test(\"Task ID is correct\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    //pm.expect(jsonData.value).to.eql(100);//remplace the 100 with the ID ",
+											"    pm.expect(jsonData.id).to.eql(idtask)",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}/{{taskId}}",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"{{taskId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get an active task [negative]",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 4xx\", function () {",
+											"    pm.response.to.be.notFound;//cuz many response have code 201, etc.",
+											"});",
+											"",
+											"//Bad scenario: response time, the correct scenario is with 200ms",
+											"pm.test(\"Response time is less than 1000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}/kjh",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"kjh"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Update a task",
+					"item": [
+						{
+							"name": "Update a task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 2xx\", function () {",
+											"    pm.response.to.be.success;//cuz many response have code 201, etc.",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "X-Requested-Id",
+										"value": "$(uuidgen)",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\" : \"updated to Buy tamagochi\"\n}\n}"
+								},
+								"url": {
+									"raw": "{{baseURLtask}}/{{taskId}}",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"{{taskId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a task [negative]",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 4xx\", function () {",
+											"    pm.response.to.be.badRequest;//cuz many response have code 201, etc.",
+											"});",
+											"//response time---bad scenario , the correct scenario is with 200ms",
+											"pm.test(\"Response time is less than 1000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											"",
+											"pm.test(\"Body matches string\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"At least one of supported fields should be set and non-empty\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "X-Requested-Id",
+										"value": "$(uuidgen)",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\" : \"\"\n}\n"
+								},
+								"url": {
+									"raw": "{{baseURLtask}}/{{taskId}}",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"{{taskId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Change a task status",
+					"item": [
+						{
+							"name": "Change a task status to complete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 2xx\", function () {",
+											"    pm.response.to.be.success;//cuz many response have code 201, etc.",
+											"});",
+											"//check the complete status 204",
+											"pm.test(\"Successful POST request\", function () {",
+											"    //pm.expect(pm.response.code).to.be.oneOf([201, 202]);",
+											"    pm.expect(pm.response.code).to.be.eql(204);",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}/{{taskId}}/close",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"{{taskId}}",
+										"close"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change a task status to complete [negative]",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"",
+											"//bad scenario could be the complete status 200",
+											"pm.test(\"Status code is 4xx\", function () {",
+											"    pm.response.to.be.notFound;//cuz many response have code 201, etc.",
+											"});",
+											"",
+											"pm.test(\"Body matches string\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"404 page not found\")});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}//close",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"",
+										"close"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Reopen a task",
+					"item": [
+						{
+							"name": "Reopen a task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 2xx\", function () {",
+											"    pm.response.to.be.success;//cuz many response have code 201, etc.",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}/{{taskId}}/reopen",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"{{taskId}}",
+										"reopen"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reopen a task [negative]",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 4xx\", function () {",
+											"    pm.response.to.be.notFound;//cuz many response have code 201, etc.",
+											"});",
+											"",
+											"pm.test(\"Body matches string\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"404 page not found\")});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}//reopen",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"",
+										"reopen"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Delete a task",
+					"item": [
+						{
+							"name": "Delete a task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 2xx\", function () {",
+											"    pm.response.to.be.success;//cuz many response have code 201, etc.",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}/{{taskId}}",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"{{taskId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a task [negative]",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"",
+											"pm.test(\"Body matches string\", function () {",
+											"    pm.expect(pm.response.text()).to.include(\"Invalid id\")});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseURLtask}}/0",
+									"host": [
+										"{{baseURLtask}}"
+									],
+									"path": [
+										"0"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
